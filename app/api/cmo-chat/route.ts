@@ -7,7 +7,7 @@ export async function POST(request:Request){
  const denied=betaOriginError(request);if(denied)return denied;
  const raw=await request.text();if(raw.length>80000)return Response.json({error:'Context is too large.'},{status:413});
  let input;try{input=z.object({question:z.string().min(1).max(2000),context:z.string().max(60000),history:z.array(z.object({role:z.enum(['user','assistant']),text:z.string().max(6000)})).max(8)}).parse(JSON.parse(raw));}catch{return Response.json({error:'Enter a shorter question.'},{status:400});}
- const key=(env as unknown as Record<string,string>).GEMINI_API_KEY||process.env.GEMINI_API_KEY;
+ const key=(typeof env!=='undefined'&&env?(env as unknown as Record<string,string>).GEMINI_API_KEY:undefined)||(typeof process!=='undefined'&&process.env?process.env.GEMINI_API_KEY:undefined)||(typeof globalThis!=='undefined'?(globalThis as Record<string,string>).GEMINI_API_KEY:undefined);
  if(!key)return Response.json({error:'Gemini is not configured on the server.'},{status:503});
  const allowance=await reserveBetaRequest(request,'chat');if(allowance)return allowance;
  try{

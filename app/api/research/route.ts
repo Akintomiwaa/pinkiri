@@ -39,11 +39,10 @@ export async function POST(request:Request){
  }
  const key=JSON.stringify(input);const hit=cache.get(key);if(hit&&Date.now()-hit.at<3600000)return Response.json({...hit.data as object,cached:true});
 
- const secrets=env as unknown as Record<string,string>;
- const google=secrets.GEMINI_API_KEY||process.env.GEMINI_API_KEY;
- const jinaKey=secrets.JINA_API_KEY||process.env.JINA_API_KEY;
+  const google=(typeof env!=='undefined'&&env?(env as unknown as Record<string,string>).GEMINI_API_KEY:undefined)||(typeof process!=='undefined'&&process.env?process.env.GEMINI_API_KEY:undefined)||(typeof globalThis!=='undefined'?(globalThis as Record<string,string>).GEMINI_API_KEY:undefined);
+  const jinaKey=(typeof env!=='undefined'&&env?(env as unknown as Record<string,string>).JINA_API_KEY:undefined)||(typeof process!=='undefined'&&process.env?process.env.JINA_API_KEY:undefined)||(typeof globalThis!=='undefined'?(globalThis as Record<string,string>).JINA_API_KEY:undefined);
 
- if(!google)return Response.json({error:'Gemini API key is not configured. Please check your environment settings.'},{status:503});
+  if(!google)return Response.json({error:'Gemini API key is not configured. Please check your environment settings.'},{status:503});
  const allowance=await reserveBetaRequest(request,'research');if(allowance)return allowance;
 
  try{
