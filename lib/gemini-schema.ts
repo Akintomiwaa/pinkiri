@@ -3,6 +3,7 @@ import {z} from 'zod';
 export function geminiSchema(schema:z.ZodTypeAny):Record<string,unknown>{
  if(schema instanceof z.ZodOptional)return geminiSchema(schema.unwrap());
  if(schema instanceof z.ZodDefault)return geminiSchema(schema.removeDefault());
+ if(schema instanceof z.ZodCatch)return geminiSchema(schema._def.innerType);
  if(schema instanceof z.ZodEffects)return geminiSchema(schema.innerType());
  if(schema instanceof z.ZodObject){
    const shape=schema.shape;

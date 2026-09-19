@@ -146,7 +146,7 @@ export async function POST(request:Request){
   Coverage: ${JSON.stringify(social.coverage)}
   Documents: ${JSON.stringify(sources)}`;
 
-  const generated=await generate(prompt,6000,resultSchema);
+  const generated=await generate(prompt,8192,resultSchema);
   const result=resultSchema.parse(generated.value),model=generated.model;
   validateEvidence(result,sources);
   if(result.calendar){
